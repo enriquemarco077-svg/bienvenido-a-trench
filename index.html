@@ -2491,8 +2491,8 @@
               <button class="btn btn-ghost" id="copyBtn" type="button">Copiar invitación con enlace</button>
             </div>
             <div class="share-link-box">
-              <span>Enlace de esta experiencia — cópialo y pégalo donde quieras</span>
-              <a href="https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q" target="_blank" rel="noopener">https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q</a>
+              <span id="shareLinkLabel">Enlace de esta experiencia — cópialo y pégalo donde quieras</span>
+              <a id="shareLink" href="https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q" target="_blank" rel="noopener">https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q</a>
             </div>
             <p class="copy-msg" id="copyMsg" aria-live="polite"></p>
           </div>
@@ -3343,7 +3343,21 @@
       /* ============ COMPARTIR ============ */
       (function shareInit() {
         var msg = document.getElementById("copyMsg");
-        var publicUrl = "https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q";
+        // La misma página vive en dos lugares: Muse y GitHub Pages.
+        // Quien la abre en GitHub comparte la frase con el enlace de GitHub;
+        // quien la abre en Muse, con el enlace de Muse.
+        var museUrl = "https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q";
+        var githubUrl = "https://enriquemarco077-svg.github.io/bienvenido-a-trench/";
+        var onGithub = /(^|\.)github\.io$/i.test(window.location.hostname || "");
+        var publicUrl = onGithub ? githubUrl : museUrl;
+        var linkEl = document.getElementById("shareLink");
+        if (linkEl) { linkEl.href = publicUrl; linkEl.textContent = publicUrl; }
+        var labelEl = document.getElementById("shareLinkLabel");
+        if (labelEl) {
+          labelEl.textContent = onGithub
+            ? "Enlace de esta experiencia en GitHub — cópialo y pégalo donde quieras"
+            : "Enlace de esta experiencia en Muse — cópialo y pégalo donde quieras";
+        }
         var invite = "|-/ Estoy recorriendo «Bienvenido a Trench», la experiencia interactiva con TODO el lore de Twenty One Pilots: la historia de Dema y Clancy capítulo a capítulo, el mapa de Trench, los nueve Obispos, los símbolos, las canciones clave y un quiz al final. Tienes que verla. East is Up.";
         var inviteWithLink = invite + "\n\n" + publicUrl;
         var shareData = {
