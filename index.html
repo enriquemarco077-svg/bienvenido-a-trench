@@ -531,6 +531,13 @@
       .clan-meta b{color:var(--ink);font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:3px}
       .clan-second{font-size:.92rem;color:var(--muted);margin:0 0 20px}
       .clan-second b{color:var(--ink)}
+      .clan-mix{max-width:56ch;margin:0 auto 20px;text-align:left}
+      .clan-mix-title{font-size:.95rem;color:var(--ink-dim);margin:0 0 12px;line-height:1.65}
+      .clan-mix-title b{color:var(--ink)}
+      .clan-mix-row{display:flex;gap:11px;align-items:flex-start;background:var(--panel);border:1px solid var(--line-soft);border-radius:10px;padding:12px 15px;margin:0 0 8px}
+      .clan-mix-dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:6px}
+      .clan-mix-row p{margin:0;font-size:.93rem;color:var(--ink-dim);line-height:1.6}
+      .clan-mix-row b{font-family:var(--font-display);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
       .clan-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
       .clan-copy-msg{font-family:var(--font-mono);font-size:.82rem;color:var(--yellow);margin:16px 0 0;min-height:1.3em;text-align:center}
       .clan-preview{display:none;margin:22px auto 0;max-width:340px;text-align:center}
@@ -2609,7 +2616,7 @@
                   <div><b>Tu canción en la historia</b><span id="clanSong"></span></div>
                   <div><b>Tu reto, según el lore</b><span id="clanChallenge"></span></div>
                 </div>
-                <p class="clan-second" id="clanSecond"></p>
+                <div class="clan-mix" id="clanSecond"></div>
                 <div class="clan-actions">
                   <button class="btn btn-yellow" id="clanShare" type="button">Compartir imagen JPG</button>
                   <button class="btn btn-ghost" id="clanDownload" type="button">Descargar JPG</button>
@@ -3563,7 +3570,8 @@
           traits: ["Siente y lo escribe", "Recae, pero reintenta", "Busca la salida"],
           song: "«Navigating» y «Overcompensate»: perderse, orientarse y salir otra vez, con la capucha puesta.",
           challenge: "No creerte la voz que dice que ya no puedes. Esa voz tiene nombre —Nico— y no eres tú.",
-          touch: "escribes y sientes como Clancy"
+          touch: "escribes y sientes como Clancy",
+          also: "También hay un Clancy en ti: sientes todo intensamente y necesitas sacarlo —escribirlo, decirlo, cantarlo— para que no se te quede atrapado en la cabeza. Ese lado tuyo a veces recae, pero siempre vuelve a intentarlo."
         },
         torch: {
           name: "Torchbearer", role: "El que guía con la antorcha", glyph: "✦", accent: "#fce300",
@@ -3571,7 +3579,8 @@
           traits: ["Leal sin condiciones", "Guía sin imponer", "Aparece en el momento justo"],
           song: "«My Blood»: si estás solo, yo me quedo. Esa es, literalmente, tu forma de estar.",
           challenge: "Acordarte de que tú también puedes perderte, y que dejarte guiar no te hace menos guía.",
-          touch: "guías como Torchbearer"
+          touch: "guías como Torchbearer",
+          also: "También tienes algo de Torchbearer: eres de los que se quedan. Acompañas sin hacer ruido, alumbras el camino de los demás y apareces justo cuando alguien está a punto de rendirse."
         },
         bandito: {
           name: "Bandito de Trench", role: "Rebelde del campamento amarillo", glyph: "||-//", accent: "#9dc24b",
@@ -3579,7 +3588,8 @@
           traits: ["Equipo ante todo", "Amarillo y a la vista", "No deja a nadie atrás"],
           song: "«Bandito» y «Jumpsuit»: el campamento, la caída y la mano que te levanta.",
           challenge: "No apagar tu luz para encajar. El amarillo se usa a la vista, aunque Dema no pueda verlo.",
-          touch: "peleas en grupo como un Bandito"
+          touch: "peleas en grupo como un Bandito",
+          also: "También tienes algo de Bandito: tu instinto es el «nosotros». Confías en tu gente, marcas el camino para los que vienen detrás y no concibes salir de nada completamente solo."
         },
         dema: {
           name: "Ciudadano de Dema", role: "Todavía dentro de la muralla", glyph: "⊙", accent: "#a49e8d",
@@ -3587,7 +3597,8 @@
           traits: ["Valora lo conocido", "Prudente ante el cambio", "Despierto, aunque no lo sepa"],
           song: "«Stressed Out» y «Choker»: la rutina que aprieta y las ganas tímidas de salir de ella.",
           challenge: "Tu siguiente paso no es escapar hoy: es atreverte a preguntar por qué la ciudad insiste en que no hay nada afuera.",
-          touch: "todavía traes algo de Dema dentro"
+          touch: "todavía traes algo de Dema dentro",
+          also: "También tienes algo de ciudadano de Dema: una parte tuya prefiere lo conocido y la rutina que da calma, y se lo piensa dos veces antes de cruzar cualquier muralla. No es debilidad: es tu lado prudente, el que mide el salto antes de darlo."
         },
         obispo: {
           name: "Obispo de Dema", role: "Guardián del orden de las nueve torres", glyph: "●●●", accent: "#e03126",
@@ -3595,11 +3606,12 @@
           traits: ["Orden y estructura", "Convicción firme", "Manda y protege"],
           song: "«Nico and the Niners»: los nueve, nombrados uno por uno. Tu himno, te guste o no.",
           challenge: "Preguntarte si el orden que defiendes protege a la gente… o solo protege al orden. Keons se lo preguntó, y cambió la historia.",
-          touch: "mandas como un Obispo"
+          touch: "mandas como un Obispo",
+          also: "También tienes algo de Obispo: te da paz el orden, que cada quien sepa su lugar y que haya reglas claras. Ese lado tuyo carga con que todo funcione, aunque a veces le cueste soltar el control."
         }
       };
       (function clanInit() {
-        var idx = 0, locked = false, resultKey = null, secondKey = null;
+        var idx = 0, locked = false, resultKey = null, secondKey = null, clanMix = [];
         var clanBlob = null, clanBlobUrl = null, clanGenerating = false;
         var scores = { clancy: 0, torch: 0, bandito: 0, dema: 0, obispo: 0 };
         var order = ["clancy", "torch", "bandito", "dema", "obispo"];
@@ -3645,6 +3657,7 @@
           resultKey = sorted[0];
           var second = sorted[1];
           secondKey = (second && scores[second] > 0) ? second : null;
+          clanMix = sorted.slice(1).filter(function (k) { return scores[k] > 0; });
           clanBlob = null;
           if (clanBlobUrl) { try { URL.revokeObjectURL(clanBlobUrl); } catch (e) {} clanBlobUrl = null; }
           var prev = document.getElementById("clanPreview");
@@ -3665,10 +3678,15 @@
           document.getElementById("clanSong").textContent = r.song;
           document.getElementById("clanChallenge").textContent = r.challenge;
           var secondEl = document.getElementById("clanSecond");
-          if (second && scores[second] > 0) {
-            secondEl.innerHTML = "Y traes un toque de <b>" + CLAN_RESULTS[second].name + "</b>: " + CLAN_RESULTS[second].touch + ". Nadie en Trench es una sola cosa.";
+          if (clanMix.length) {
+            var mixHtml = '<p class="clan-mix-title">Eres <b>' + r.name + '</b>, sí… pero nadie en Trench es una sola cosa. En la forma en que respondiste también apareció esto de ti:</p>';
+            clanMix.forEach(function (k) {
+              var m = CLAN_RESULTS[k];
+              mixHtml += '<div class="clan-mix-row"><span class="clan-mix-dot" style="background:' + m.accent + '" aria-hidden="true"></span><p><b style="color:' + m.accent + '">También tienes algo de ' + m.name + '</b><br>' + m.also + '</p></div>';
+            });
+            secondEl.innerHTML = mixHtml;
           } else {
-            secondEl.textContent = "";
+            secondEl.innerHTML = '<p class="clan-mix-title">Respondiste las ocho situaciones desde el mismo lugar: eres <b>' + r.name + '</b> de una sola pieza, sin mezcla de ningún otro bando. En Trench, eso también dice mucho de ti.</p>';
           }
           copyMsg.textContent = "Generando tu tarjeta en JPG…";
           play.style.display = "none";
@@ -3688,7 +3706,13 @@
         }
         function clanShareText() {
           var r = CLAN_RESULTS[resultKey];
-          return "|-/ Hice el test de bandos de «El universo de Twenty One Pilots» y mi lugar en la historia es: " + r.name + " — " + r.role + ". ¿Tú a qué bando perteneces? East is Up.\n\n" + clanPublicUrl();
+          var mixTxt = "";
+          if (clanMix && clanMix.length) {
+            var names = clanMix.map(function (k) { return CLAN_RESULTS[k].name; });
+            var mixList = names.length > 1 ? names.slice(0, -1).join(", ") + " y " + names[names.length - 1] : names[0];
+            mixTxt = " Y también tengo algo de " + mixList + ": nadie en Trench es una sola cosa.";
+          }
+          return "|-/ Hice el test de bandos de «El universo de Twenty One Pilots» y mi lugar en la historia es: " + r.name + " — " + r.role + "." + mixTxt + " ¿Tú a qué bando perteneces? East is Up.\n\n" + clanPublicUrl();
         }
         function clanDone(msgText) {
           copyMsg.textContent = msgText;
@@ -3813,13 +3837,19 @@
           }
           drawBox("Tu canción en la historia", r.song);
           drawBox("Tu reto, según el lore", r.challenge);
-          /* segundo bando */
-          if (secondKey && CLAN_RESULTS[secondKey]) {
-            var s2 = CLAN_RESULTS[secondKey];
-            var secondText = "Y traes un toque de " + s2.name + ": " + s2.touch + ". Nadie en Trench es una sola cosa.";
+          /* también tienes algo de otros bandos */
+          var mixText = "";
+          if (clanMix && clanMix.length) {
+            var mixNames = clanMix.map(function (k) { return CLAN_RESULTS[k].name; });
+            var mixListC = mixNames.length > 1 ? mixNames.slice(0, -1).join(", ") + " y " + mixNames[mixNames.length - 1] : mixNames[0];
+            mixText = "También tienes algo de " + mixListC + ". Nadie en Trench es una sola cosa.";
+          } else if (resultKey) {
+            mixText = "De una sola pieza: " + r.name + ", sin mezcla de ningún otro bando.";
+          }
+          if (mixText) {
             ctx.font = "400 25px Archivo, sans-serif";
             ctx.fillStyle = "#b9b5a6"; ctx.textAlign = "center";
-            wrapLines(ctx, secondText, 880).forEach(function (ln) { y += 36; ctx.fillText(ln, W / 2, y); });
+            wrapLines(ctx, mixText, 880).forEach(function (ln) { y += 36; ctx.fillText(ln, W / 2, y); });
             ctx.textAlign = "left";
           }
           /* pie con el enlace de esta versión */
@@ -3901,7 +3931,7 @@
           } else { fb(); }
         }
         document.getElementById("clanRestart").addEventListener("click", function () {
-          idx = 0; resultKey = null; secondKey = null; clanBlob = null;
+          idx = 0; resultKey = null; secondKey = null; clanMix = []; clanBlob = null;
           if (clanBlobUrl) { try { URL.revokeObjectURL(clanBlobUrl); } catch (e) {} clanBlobUrl = null; }
           var prev = document.getElementById("clanPreview");
           if (prev) prev.classList.remove("show");
