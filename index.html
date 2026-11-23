@@ -533,6 +533,11 @@
       .clan-second b{color:var(--ink)}
       .clan-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
       .clan-copy-msg{font-family:var(--font-mono);font-size:.82rem;color:var(--yellow);margin:16px 0 0;min-height:1.3em;text-align:center}
+      .clan-preview{display:none;margin:22px auto 0;max-width:340px;text-align:center}
+      .clan-preview.show{display:block}
+      .clan-preview p{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+      .clan-preview img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+      .clan-preview a{display:inline-flex;margin-top:12px;font-weight:700;font-size:.9rem;color:var(--yellow)}
       @media(min-width:1024px) and (orientation:landscape){
         .clan-shell{max-width:880px;margin-left:auto;margin-right:auto}
       }
@@ -2559,10 +2564,16 @@
                 </div>
                 <p class="clan-second" id="clanSecond"></p>
                 <div class="clan-actions">
-                  <button class="btn btn-yellow" id="clanShare" type="button">Compartir mi resultado</button>
+                  <button class="btn btn-yellow" id="clanShare" type="button">Compartir imagen JPG</button>
+                  <button class="btn btn-ghost" id="clanDownload" type="button">Descargar JPG</button>
                   <button class="btn btn-ghost" id="clanRestart" type="button">Hacer el test de nuevo</button>
                 </div>
                 <p class="clan-copy-msg" id="clanCopyMsg" aria-live="polite"></p>
+                <div class="clan-preview" id="clanPreview">
+                  <p>Así se ve tu tarjeta para compartir</p>
+                  <img id="clanPreviewImg" alt="Tarjeta en imagen JPG con tu resultado del test de bandos de Trench" />
+                  <a id="clanPreviewDownload" href="#" download="mi-bando-trench.jpg">Descargar esta imagen JPG ↓</a>
+                </div>
               </div>
             </div>
           </div>
@@ -3532,7 +3543,8 @@
         }
       };
       (function clanInit() {
-        var idx = 0, locked = false, resultKey = null;
+        var idx = 0, locked = false, resultKey = null, secondKey = null;
+        var clanBlob = null, clanBlobUrl = null, clanGenerating = false;
         var scores = { clancy: 0, torch: 0, bandito: 0, dema: 0, obispo: 0 };
         var order = ["clancy", "torch", "bandito", "dema", "obispo"];
         var play = document.getElementById("clanPlay");
@@ -3576,6 +3588,11 @@
           var sorted = order.slice().sort(function (a, b) { return scores[b] - scores[a]; });
           resultKey = sorted[0];
           var second = sorted[1];
+          secondKey = (second && scores[second] > 0) ? second : null;
+          clanBlob = null;
+          if (clanBlobUrl) { try { URL.revokeObjectURL(clanBlobUrl); } catch (e) {} clanBlobUrl = null; }
+          var prev = document.getElementById("clanPreview");
+          if (prev) prev.classList.remove("show");
           var r = CLAN_RESULTS[resultKey];
           card.style.setProperty("--clan-accent", r.accent);
           document.getElementById("clanGlyph").textContent = r.glyph;
@@ -3597,58 +3614,283 @@
           } else {
             secondEl.textContent = "";
           }
-          copyMsg.textContent = "";
+          copyMsg.textContent = "Generando tu tarjeta en JPG…";
           play.style.display = "none";
           final.classList.add("show");
           card.scrollIntoView({ behavior: "smooth", block: "center" });
+          ensureClanImage(function (ok) {
+            copyMsg.textContent = ok ? "Tu tarjeta JPG está lista: compártela o descárgala aquí abajo." : "";
+            if (ok) window.setTimeout(function () { if (copyMsg.textContent.indexOf("tarjeta JPG") > -1) copyMsg.textContent = ""; }, 6000);
+          });
         }
-        document.getElementById("clanRestart").addEventListener("click", function () {
-          idx = 0; resultKey = null;
-          scores = { clancy: 0, torch: 0, bandito: 0, dema: 0, obispo: 0 };
-          final.classList.remove("show");
-          play.style.display = "";
-          render();
-          document.getElementById("bando").scrollIntoView({ behavior: "smooth" });
-        });
-        document.getElementById("clanShare").addEventListener("click", function () {
-          if (!resultKey) return;
-          var r = CLAN_RESULTS[resultKey];
+        /* ---------- Tarjeta JPG del resultado ---------- */
+        function clanPublicUrl() {
           var museUrl = "https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q";
           var githubUrl = "https://enriquemarco077-svg.github.io/bienvenido-a-trench/";
           var onGithub = /(^|\.)github\.io$/i.test(window.location.hostname || "");
-          var publicUrl = onGithub ? githubUrl : museUrl;
-          var text = "|-/ Hice el test de bandos de «Bienvenido a Trench» y mi lugar en la historia es: " + r.name + " — " + r.role + ". ¿Tú a qué bando perteneces? East is Up.\n\n" + publicUrl;
-          function done(msgText) {
-            copyMsg.textContent = msgText;
-            window.setTimeout(function () { copyMsg.textContent = ""; }, 5200);
+          return onGithub ? githubUrl : museUrl;
+        }
+        function clanShareText() {
+          var r = CLAN_RESULTS[resultKey];
+          return "|-/ Hice el test de bandos de «Bienvenido a Trench» y mi lugar en la historia es: " + r.name + " — " + r.role + ". ¿Tú a qué bando perteneces? East is Up.\n\n" + clanPublicUrl();
+        }
+        function clanDone(msgText) {
+          copyMsg.textContent = msgText;
+          window.setTimeout(function () { if (copyMsg.textContent === msgText) copyMsg.textContent = ""; }, 7000);
+        }
+        function stripHtml(html) {
+          var d = document.createElement("div");
+          d.innerHTML = html || "";
+          return (d.textContent || "").replace(/\s+/g, " ").trim();
+        }
+        function wrapLines(ctx, text, maxW) {
+          var words = String(text).split(/\s+/), lines = [], line = "";
+          words.forEach(function (w) {
+            var test = line ? line + " " + w : w;
+            if (ctx.measureText(test).width <= maxW) { line = test; return; }
+            if (line) lines.push(line);
+            while (w && ctx.measureText(w).width > maxW) {
+              var cut = w.length;
+              while (cut > 1 && ctx.measureText(w.slice(0, cut)).width > maxW) cut--;
+              lines.push(w.slice(0, cut));
+              w = w.slice(cut);
+            }
+            line = w;
+          });
+          if (line) lines.push(line);
+          return lines;
+        }
+        function rr(ctx, x, y, w, h, rad) {
+          ctx.beginPath();
+          ctx.moveTo(x + rad, y);
+          ctx.arcTo(x + w, y, x + w, y + h, rad);
+          ctx.arcTo(x + w, y + h, x, y + h, rad);
+          ctx.arcTo(x, y + h, x, y, rad);
+          ctx.arcTo(x, y, x + w, y, rad);
+          ctx.closePath();
+        }
+        function drawClanCanvas() {
+          var r = CLAN_RESULTS[resultKey];
+          var W = 1080, H = 1700;
+          var cv = document.createElement("canvas");
+          cv.width = W; cv.height = H;
+          var ctx = cv.getContext("2d");
+          ctx.fillStyle = "#0a0a0c"; ctx.fillRect(0, 0, W, H);
+          rr(ctx, 36, 36, W - 72, H - 72, 30);
+          ctx.fillStyle = "#121216"; ctx.fill();
+          ctx.strokeStyle = "#2b2b33"; ctx.lineWidth = 2; ctx.stroke();
+          ctx.fillStyle = r.accent; ctx.fillRect(36, 36, W - 72, 16);
+          ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+          ctx.fillStyle = "#fce300";
+          ctx.font = "700 25px 'Space Mono', monospace";
+          ctx.fillText("BIENVENIDO A TRENCH", W / 2, 138);
+          ctx.fillStyle = "#8f8b7f";
+          ctx.font = "700 21px 'Space Mono', monospace";
+          ctx.fillText("TU LUGAR EN LA HISTORIA ES", W / 2, 182);
+          ctx.fillStyle = r.accent;
+          ctx.font = "700 104px 'Space Mono', monospace";
+          ctx.fillText(r.glyph, W / 2, 308);
+          var nameSize = 82;
+          ctx.font = "700 " + nameSize + "px Oswald, Archivo, sans-serif";
+          while (ctx.measureText(r.name.toUpperCase()).width > 900 && nameSize > 42) {
+            nameSize -= 6;
+            ctx.font = "700 " + nameSize + "px Oswald, Archivo, sans-serif";
           }
-          if (navigator.share) {
-            navigator.share({ title: "Bienvenido a Trench — mi bando", text: text }).then(function () {
-              done("Resultado compartido. Que la antorcha llegue lejos. 🔦");
-            }).catch(function () {});
-            return;
+          ctx.fillText(r.name.toUpperCase(), W / 2, 412);
+          ctx.fillStyle = "#edeade";
+          ctx.font = "600 33px Oswald, Archivo, sans-serif";
+          var roleLines = wrapLines(ctx, r.role.toUpperCase(), 880);
+          var y = 462;
+          roleLines.forEach(function (ln) { ctx.fillText(ln, W / 2, y); y += 40; });
+          y += 6;
+          ctx.fillStyle = r.accent; ctx.fillRect(W / 2 - 70, y, 140, 5);
+          y += 58;
+          /* descripción */
+          ctx.textAlign = "left";
+          ctx.fillStyle = "#ddd9cb";
+          ctx.font = "400 29px Archivo, sans-serif";
+          var descLines = wrapLines(ctx, stripHtml(r.desc), 880);
+          descLines.forEach(function (ln) { ctx.fillText(ln, 100, y); y += 43; });
+          y += 22;
+          /* rasgos en píldoras */
+          ctx.font = "700 19px 'Space Mono', monospace";
+          var pills = r.traits.map(function (t) {
+            var label = t.toUpperCase();
+            return { label: label, w: ctx.measureText(label).width + 40 };
+          });
+          var rows = [], row = [], rowW = 0;
+          pills.forEach(function (p) {
+            if (row.length && rowW + 14 + p.w > 880) { rows.push({ items: row, w: rowW }); row = []; rowW = 0; }
+            rowW = row.length ? rowW + 14 + p.w : p.w;
+            row.push(p);
+          });
+          if (row.length) rows.push({ items: row, w: rowW });
+          rows.forEach(function (rw) {
+            var px = (W - rw.w) / 2;
+            rw.items.forEach(function (p) {
+              rr(ctx, px, y - 28, p.w, 46, 23);
+              ctx.strokeStyle = r.accent; ctx.lineWidth = 2; ctx.stroke();
+              ctx.fillStyle = r.accent; ctx.textAlign = "center";
+              ctx.fillText(p.label, px + p.w / 2, y + 5);
+              px += p.w + 14;
+            });
+            y += 62;
+          });
+          ctx.textAlign = "left";
+          y += 8;
+          /* cajas: canción y reto */
+          function drawBox(label, text) {
+            ctx.font = "400 26px Archivo, sans-serif";
+            var lines = wrapLines(ctx, text, 880 - 44);
+            var bh = 24 + 26 + 8 + lines.length * 37 + 20;
+            rr(ctx, 100, y, 880, bh, 14);
+            ctx.fillStyle = "#1b1b21"; ctx.fill();
+            ctx.strokeStyle = "#2b2b33"; ctx.lineWidth = 1.5; ctx.stroke();
+            ctx.fillStyle = "#b9b5a6";
+            ctx.font = "700 18px 'Space Mono', monospace";
+            ctx.fillText(label.toUpperCase(), 122, y + 42);
+            ctx.fillStyle = "#edeade";
+            ctx.font = "400 26px Archivo, sans-serif";
+            var ty = y + 42 + 34;
+            lines.forEach(function (ln) { ctx.fillText(ln, 122, ty); ty += 37; });
+            y += bh + 18;
           }
-          function fallback() {
+          drawBox("Tu canción en la historia", r.song);
+          drawBox("Tu reto, según el lore", r.challenge);
+          /* segundo bando */
+          if (secondKey && CLAN_RESULTS[secondKey]) {
+            var s2 = CLAN_RESULTS[secondKey];
+            var secondText = "Y traes un toque de " + s2.name + ": " + s2.touch + ". Nadie en Trench es una sola cosa.";
+            ctx.font = "400 25px Archivo, sans-serif";
+            ctx.fillStyle = "#b9b5a6"; ctx.textAlign = "center";
+            wrapLines(ctx, secondText, 880).forEach(function (ln) { y += 36; ctx.fillText(ln, W / 2, y); });
+            ctx.textAlign = "left";
+          }
+          /* pie con el enlace de esta versión */
+          ctx.strokeStyle = "#2b2b33"; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(100, H - 208); ctx.lineTo(W - 100, H - 208); ctx.stroke();
+          ctx.textAlign = "center";
+          ctx.fillStyle = "#fce300";
+          ctx.font = "700 24px 'Space Mono', monospace";
+          ctx.fillText("EAST IS UP  •  |-/", W / 2, H - 158);
+          ctx.fillStyle = "#b9b5a6";
+          ctx.font = "400 20px 'Space Mono', monospace";
+          ctx.fillText("HAZ EL TEST Y DESCUBRE TU BANDO:", W / 2, H - 118);
+          ctx.fillStyle = "#edeade";
+          ctx.font = "400 19px 'Space Mono', monospace";
+          var urlLines = wrapLines(ctx, clanPublicUrl(), 900);
+          var uy = H - 84;
+          urlLines.forEach(function (ln) { ctx.fillText(ln, W / 2, uy); uy += 26; });
+          return cv;
+        }
+        function ensureClanImage(cb) {
+          if (!resultKey) { cb(false); return; }
+          if (clanBlob) { cb(true); return; }
+          if (clanGenerating) { window.setTimeout(function () { ensureClanImage(cb); }, 250); return; }
+          clanGenerating = true;
+          function make() {
+            try {
+              var cv = drawClanCanvas();
+              if (cv.toBlob) {
+                cv.toBlob(function (blob) {
+                  clanGenerating = false;
+                  if (!blob) { cb(false); return; }
+                  clanBlob = blob;
+                  if (clanBlobUrl) { try { URL.revokeObjectURL(clanBlobUrl); } catch (e) {} }
+                  clanBlobUrl = URL.createObjectURL(blob);
+                  var img = document.getElementById("clanPreviewImg");
+                  var dl = document.getElementById("clanPreviewDownload");
+                  var prev = document.getElementById("clanPreview");
+                  if (img) img.src = clanBlobUrl;
+                  if (dl) dl.href = clanBlobUrl;
+                  if (prev) prev.classList.add("show");
+                  cb(true);
+                }, "image/jpeg", 0.92);
+              } else {
+                clanGenerating = false; cb(false);
+              }
+            } catch (e) { clanGenerating = false; cb(false); }
+          }
+          if (document.fonts && document.fonts.ready) { document.fonts.ready.then(make); } else { make(); }
+        }
+        function downloadClanImage() {
+          ensureClanImage(function (ok) {
+            if (!ok || !clanBlobUrl) { clanDone("No se pudo generar la imagen; comparte tu resultado: " + CLAN_RESULTS[resultKey].name + "."); return; }
+            var a = document.createElement("a");
+            a.href = clanBlobUrl;
+            a.download = "mi-bando-trench.jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            clanDone("Imagen JPG descargada. Ya la puedes enviar por WhatsApp o donde quieras.");
+          });
+        }
+        function copyClanText() {
+          var text = clanShareText();
+          function fb() {
             try {
               var ta = document.createElement("textarea");
-              ta.value = text;
-              ta.setAttribute("readonly", "");
+              ta.value = text; ta.setAttribute("readonly", "");
               ta.style.position = "fixed"; ta.style.top = "0"; ta.style.left = "0"; ta.style.opacity = "0";
               document.body.appendChild(ta);
               ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
               var ok = false;
               try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
               document.body.removeChild(ta);
-              done(ok ? "Tu resultado se copió: pégalo donde quieras y reta a alguien a hacer el test." : "No se pudo copiar automáticamente; tu resultado es: " + r.name + " — " + r.role + ".");
-            } catch (e) {
-              done("Tu resultado es: " + r.name + " — " + r.role + ".");
-            }
+              clanDone(ok ? "Texto copiado: pégalo junto con tu imagen." : "Tu resultado es: " + CLAN_RESULTS[resultKey].name + " — " + CLAN_RESULTS[resultKey].role + ".");
+            } catch (e) { clanDone("Tu resultado es: " + CLAN_RESULTS[resultKey].name + "."); }
           }
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(function () {
-              done("Tu resultado se copió: pégalo donde quieras y reta a alguien a hacer el test.");
-            }).catch(fallback);
-          } else { fallback(); }
+            navigator.clipboard.writeText(text).then(function () { clanDone("Texto copiado: pégalo junto con tu imagen."); }).catch(fb);
+          } else { fb(); }
+        }
+        document.getElementById("clanRestart").addEventListener("click", function () {
+          idx = 0; resultKey = null; secondKey = null; clanBlob = null;
+          if (clanBlobUrl) { try { URL.revokeObjectURL(clanBlobUrl); } catch (e) {} clanBlobUrl = null; }
+          var prev = document.getElementById("clanPreview");
+          if (prev) prev.classList.remove("show");
+          scores = { clancy: 0, torch: 0, bandito: 0, dema: 0, obispo: 0 };
+          final.classList.remove("show");
+          play.style.display = "";
+          render();
+          document.getElementById("bando").scrollIntoView({ behavior: "smooth" });
+        });
+        var clanDlBtn = document.getElementById("clanDownload");
+        if (clanDlBtn) clanDlBtn.addEventListener("click", function () { if (resultKey) downloadClanImage(); });
+        var clanPrevDl = document.getElementById("clanPreviewDownload");
+        if (clanPrevDl) clanPrevDl.addEventListener("click", function () { clanDone("Imagen JPG descargada. Ya la puedes enviar por WhatsApp o donde quieras."); });
+        document.getElementById("clanShare").addEventListener("click", function () {
+          if (!resultKey) return;
+          var r = CLAN_RESULTS[resultKey];
+          clanDone("Generando tu imagen JPG…");
+          ensureClanImage(function (ok) {
+            if (!ok || !clanBlob) { copyClanText(); return; }
+            var file = null;
+            try { file = new File([clanBlob], "mi-bando-trench.jpg", { type: "image/jpeg" }); } catch (e) { file = null; }
+            var text = clanShareText();
+            if (file && navigator.canShare && navigator.share) {
+              var payload = { files: [file], title: "Bienvenido a Trench — mi bando", text: text };
+              if (navigator.canShare(payload)) {
+                navigator.share(payload).then(function () {
+                  clanDone("Imagen compartida. Que la antorcha llegue lejos.");
+                }).catch(function (err) {
+                  if (err && err.name === "AbortError") { clanDone("Tu tarjeta JPG está lista aquí abajo para descargarla."); return; }
+                  downloadClanImage();
+                });
+                return;
+              }
+            }
+            if (navigator.share) {
+              navigator.share({ title: "Bienvenido a Trench — mi bando", text: text }).then(function () {
+                downloadClanImage();
+              }).catch(function (err) {
+                if (err && err.name === "AbortError") { clanDone("Tu tarjeta JPG está lista aquí abajo para descargarla."); return; }
+                downloadClanImage();
+              });
+              return;
+            }
+            downloadClanImage();
+          });
         });
         render();
       })();
