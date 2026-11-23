@@ -706,6 +706,53 @@
       .chapter-spotify .cs-actions a,.chapter-spotify .cs-actions button{font-size:.84rem}
       @media(max-width:560px){.symbol-pop{bottom:120px}.dock-chip{flex:1 1 28%;text-align:center;font-size:.72rem;padding:6px 6px;white-space:normal;line-height:1.25}.hero{padding-bottom:132px}}
 
+      /* ---------- REPRODUCTOR EN DOS FASES: mini barra (fase 1) / reproductor completo (fase 2) ---------- */
+      .dock-mini{
+        display:none;width:100%;align-items:center;gap:11px;text-align:left;
+        background:transparent;border:0;color:inherit;padding:4px;min-height:3.1rem;
+        -webkit-tap-highlight-color:transparent;
+      }
+      .spotify-dock.mini{padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+      .spotify-dock.mini .dock-head,.spotify-dock.mini .dock-body{display:none}
+      .spotify-dock.mini .dock-mini{display:flex}
+      .dm-icon{
+        flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:1.05rem;
+        background:#1db954;color:#0b1f12;
+      }
+      .dm-text{flex:1;min-width:0}
+      .dm-text b{display:block;font-size:.88rem;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .dm-text span{display:block;font-size:.76rem;color:#b9b5a6;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      body.mode-trench .dm-text span{color:#5c5738}
+      .dm-open{
+        flex:none;font-size:.74rem;font-weight:800;letter-spacing:.04em;color:#1db954;
+        border:1px solid #1db954;border-radius:999px;padding:7px 11px;white-space:nowrap;
+      }
+      body.mode-trench .dm-open{color:#14773a;border-color:#14773a}
+
+      /* ---------- PISTAS TÁCTILES: radar suave en los botones tras ~2 s sin interactuar ---------- */
+      :root{--hint-rgb:252,227,0}
+      body.mode-trench{--hint-rgb:150,120,0}
+      @keyframes tapRadar{
+        0%{box-shadow:0 0 0 0 rgba(var(--hint-rgb),.45)}
+        70%{box-shadow:0 0 0 11px rgba(var(--hint-rgb),0)}
+        100%{box-shadow:0 0 0 0 rgba(var(--hint-rgb),0)}
+      }
+      @keyframes tapBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+      body.tap-hints .dm-open{animation:tapRadar 1.9s ease-out infinite}
+      body.tap-hints .dm-icon{animation:tapBreathe 1.9s ease-in-out infinite}
+      body.tap-hints .dock-toggle,
+      body.tap-hints .dock-chip,
+      body.tap-hints .btn,
+      body.tap-hints .ch-chev{animation:tapRadar 1.9s ease-out infinite}
+      body.tap-hints .q-opt:not(:disabled),
+      body.tap-hints .clan-opt:not(:disabled),
+      body.tap-hints .escape-choice,
+      body.tap-hints .bishop-btn{animation:tapRadar 1.9s ease-out infinite,tapBreathe 1.9s ease-in-out infinite}
+      body.tap-hints .q-opt:nth-child(even),
+      body.tap-hints .clan-opt:nth-child(even),
+      body.tap-hints .escape-choice:nth-child(even),
+      body.tap-hints .bishop-btn:nth-child(even){animation-delay:.65s,.65s}
+
       /* ---------- ESCAPE CON DECISIONES ---------- */
       .escape-shell{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;overflow:hidden}
       .escape-stage{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px}
@@ -2665,8 +2712,16 @@
       <p class="lb-hint">Toca «Acercar» y arrastra para explorar el detalle · Esc para cerrar</p>
     </div>
 
-    <!-- Reproductor de Spotify: escucha mientras lees (compacto; se despliega al tocarlo) -->
-    <div class="spotify-dock" id="spotifyDock" role="region" aria-label="Reproductor de Spotify — escucha mientras lees">
+    <!-- Reproductor de Spotify en dos fases: mini barra abajo (fase 1); al tocarla se abre el reproductor completo (fase 2) -->
+    <div class="spotify-dock mini" id="spotifyDock" role="region" aria-label="Reproductor de Spotify — escucha mientras lees">
+      <button class="dock-mini" id="dockMini" type="button" aria-expanded="false" aria-controls="dockBody">
+        <span class="dm-icon" aria-hidden="true">🎧</span>
+        <span class="dm-text">
+          <b>Escucha mientras lees — Spotify</b>
+          <span id="dockMiniSong">«Heavydirtysoul» · Cap. 1 — Blurryface</span>
+        </span>
+        <span class="dm-open" aria-hidden="true">Abrir ▴</span>
+      </button>
       <div class="dock-head">
         <div class="dock-meta">
           <b id="dockTitle"><span class="sp-dot" aria-hidden="true">●</span> Escucha mientras lees — en Spotify</b>
@@ -4012,12 +4067,28 @@
 
       /* ============ SPOTIFY: ESCUCHA MIENTRAS LEES (canciones reales por capítulo) ============ */
       (function spotifyInit(){
+        var dock=document.getElementById("spotifyDock");
         var dockFrame=document.getElementById("dockFrame");
         var dockSub=document.getElementById("dockSub");
+        var dockMini=document.getElementById("dockMini");
+        var dockMiniSong=document.getElementById("dockMiniSong");
         var dockChips=document.getElementById("dockChips");
         var dockToggle=document.getElementById("dockToggle");
         var dockBody=document.getElementById("dockBody");
         if(!dockFrame) return;
+        // Dos fases: la mini barra (fase 1) ocupa poco espacio abajo; al abrirla aparece el reproductor completo (fase 2)
+        function expandDock(){
+          if(dock) dock.classList.remove("mini");
+          if(dockBody) dockBody.classList.remove("hidden");
+          if(dockToggle){ dockToggle.textContent="Ocultar reproductor"; dockToggle.setAttribute("aria-expanded","true"); }
+          if(dockMini) dockMini.setAttribute("aria-expanded","true");
+        }
+        function collapseDock(){
+          if(dock) dock.classList.add("mini");
+          if(dockBody) dockBody.classList.add("hidden");
+          if(dockToggle){ dockToggle.textContent="🎧 Mostrar reproductor"; dockToggle.setAttribute("aria-expanded","false"); }
+          if(dockMini) dockMini.setAttribute("aria-expanded","false");
+        }
         // Una canción real por capítulo, tomada de la lista verificada de SONGS
         var CHAPTER_TRACKS=[
           {songIdx:0, chapter:"Capítulo 1 — Blurryface", why:"El primer escape, con Blurryface al volante: así suena el nacimiento del miedo."},
@@ -4035,16 +4106,13 @@
           dockFrame.src=embedUrl(s);
           dockFrame.title="Reproductor de Spotify — "+s.t+", de Twenty One Pilots";
           if(dockSub) dockSub.textContent="«"+s.t+"» · "+ct.chapter;
+          if(dockMiniSong) dockMiniSong.textContent="«"+s.t+"» · "+ct.chapter;
           if(dockChips){
             var chips=dockChips.querySelectorAll(".dock-chip");
             chips.forEach(function(c,j){ c.classList.toggle("active", j===i); c.setAttribute("aria-pressed", j===i?"true":"false"); });
           }
-          if(dockBody && dockBody.classList.contains("hidden")){
-            dockBody.classList.remove("hidden");
-            if(dockToggle){ dockToggle.textContent="Ocultar reproductor"; dockToggle.setAttribute("aria-expanded","true"); }
-          }
+          expandDock();
           if(scrollToDock){
-            var dock=document.getElementById("spotifyDock");
             if(dock) dock.scrollIntoView({behavior:"smooth",block:"nearest"});
           }
         }
@@ -4060,12 +4128,14 @@
             dockChips.appendChild(b);
           });
         }
-        // Mostrar / ocultar el reproductor fijo: arranca compacto para no tapar la lectura
-        if(dockToggle && dockBody){
+        // Fase 1 → fase 2: tocar la mini barra abre el reproductor completo;
+        // el botón «Ocultar reproductor» de la fase 2 regresa a la mini barra
+        if(dockMini){
+          dockMini.addEventListener("click",function(){ expandDock(); });
+        }
+        if(dockToggle){
           dockToggle.addEventListener("click",function(){
-            var hidden=dockBody.classList.toggle("hidden");
-            dockToggle.textContent= hidden?"🎧 Mostrar reproductor":"Ocultar reproductor";
-            dockToggle.setAttribute("aria-expanded", hidden?"false":"true");
+            if(dock && dock.classList.contains("mini")) expandDock(); else collapseDock();
           });
         }
         // Reproductor de Spotify dentro de cada capítulo, para escuchar mientras se lee ese capítulo.
@@ -4097,6 +4167,22 @@
           box.appendChild(head); box.appendChild(p); box.appendChild(frame); box.appendChild(actions);
           content.insertBefore(box, content.firstChild);
         });
+      })();
+
+      /* ============ PISTAS TÁCTILES: si el lector se queda ~2 s sin tocar nada, los botones
+         principales emiten un radar suave (anillo que se expande y un leve «respiro» de tamaño)
+         para que se note que se pueden pulsar. Cualquier toque, tecla o scroll lo apaga al instante. ============ */
+      (function tapHintsInit(){
+        var IDLE_MS=2000, timer=null;
+        function arm(){
+          document.body.classList.remove("tap-hints");
+          if(timer) clearTimeout(timer);
+          timer=setTimeout(function(){ document.body.classList.add("tap-hints"); },IDLE_MS);
+        }
+        ["pointerdown","keydown","touchstart","wheel","scroll"].forEach(function(ev){
+          window.addEventListener(ev,arm,{passive:true});
+        });
+        arm();
       })();
 
       /* ============ SÍMBOLOS ESCONDIDOS + INVENTARIO ============ */
