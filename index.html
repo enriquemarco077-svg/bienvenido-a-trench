@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
-    <meta name="description" content="La historia completa de Dema, Trench y Clancy: el lore de Twenty One Pilots explicado capítulo a capítulo, con mapa interactivo, personajes, símbolos, línea de tiempo y quiz." />
+    <meta name="description" content="La historia completa de Dema, Trench y Clancy: el lore de Twenty One Pilots explicado capítulo a capítulo, con mapa interactivo, personajes, símbolos, línea de tiempo, quiz y test para descubrir a qué bando perteneces." />
     <link rel="icon" href="data:," />
     <title>Bienvenido a Trench: el lore de Twenty One Pilots</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -474,6 +474,79 @@
       .quiz-final .big-score{font-family:var(--font-mono);font-size:1rem;color:var(--ink-dim);letter-spacing:.14em}
       .quiz-final p{color:var(--ink-dim);max-width:52ch;margin:10px auto 22px}
 
+      /* ---------- test de bando / clan ---------- */
+      .clan-shell{
+        background:linear-gradient(180deg,var(--panel-2),var(--panel));
+        border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;
+        position:relative;
+      }
+      .clan-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+      .clan-count{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+      .clan-note{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.14em;color:var(--yellow);text-transform:uppercase}
+      .clan-track{height:8px;background:var(--bg-2);border-radius:99px;overflow:hidden;margin-bottom:22px;border:1px solid var(--line-soft)}
+      .clan-fill{height:100%;background:repeating-linear-gradient(-45deg,var(--yellow) 0 12px,var(--yellow-dim) 12px 24px);width:0%;transition:width .4s ease}
+      .clan-q{font-family:var(--font-display);font-size:clamp(1.3rem,4.4vw,1.7rem);font-weight:600;line-height:1.25;margin:0 0 20px;text-transform:none}
+      .clan-opts{display:grid;gap:10px}
+      .clan-opt{
+        text-align:left;background:var(--bg-2);border:1px solid var(--line);color:var(--ink);
+        border-radius:11px;padding:15px 18px;font-size:1rem;font-weight:500;min-height:3.4rem;
+        display:flex;align-items:center;gap:12px;width:100%;line-height:1.5;
+        transition:border-color .15s ease,background .15s ease,transform .12s ease;
+      }
+      .clan-opt .opt-dot{
+        flex:none;width:14px;height:14px;border-radius:50%;border:2px solid var(--muted);background:transparent;
+      }
+      .clan-opt:not(:disabled):hover{border-color:var(--yellow)}
+      .clan-opt:not(:disabled):hover .opt-dot{border-color:var(--yellow)}
+      .clan-opt.picked{border-color:var(--yellow);background:rgba(252,227,0,.1)}
+      .clan-opt.picked .opt-dot{background:var(--yellow);border-color:var(--yellow)}
+      .clan-opt:disabled{opacity:.85;cursor:default}
+      .clan-final{display:none;padding:8px 0 2px}
+      .clan-final.show{display:block}
+      .clan-card{
+        border:1px solid var(--line);border-radius:12px;padding:26px 24px;text-align:center;
+        background:var(--bg-2);position:relative;overflow:hidden;
+      }
+      .clan-card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:var(--clan-accent,var(--yellow))}
+      .clan-glyph{
+        font-family:var(--font-mono);font-weight:700;font-size:2.4rem;line-height:1;
+        color:var(--clan-accent,var(--yellow));display:block;margin:4px 0 10px;
+      }
+      .clan-kicker{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0}
+      .clan-name{
+        font-family:var(--font-display);font-size:clamp(1.9rem,6vw,2.7rem);font-weight:700;
+        text-transform:uppercase;color:var(--clan-accent,var(--yellow));margin:6px 0 2px;line-height:1.05;
+      }
+      .clan-role{font-family:var(--font-display);font-size:1.05rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);margin:0 0 14px}
+      .clan-desc{color:var(--ink-dim);max-width:56ch;margin:0 auto 16px;line-height:1.7;text-align:left}
+      .clan-desc b{color:var(--ink)}
+      .clan-traits{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 18px;padding:0;list-style:none}
+      .clan-traits li{
+        font-family:var(--font-mono);font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+        border:1px solid var(--clan-accent,var(--yellow));color:var(--clan-accent,var(--yellow));
+        border-radius:999px;padding:6px 12px;background:rgba(252,227,0,.05);
+      }
+      .clan-meta{display:grid;gap:10px;text-align:left;max-width:56ch;margin:0 auto 20px}
+      .clan-meta div{background:var(--panel);border:1px solid var(--line-soft);border-radius:10px;padding:13px 16px;font-size:.94rem;color:var(--ink-dim);line-height:1.6}
+      .clan-meta b{color:var(--ink);font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:3px}
+      .clan-second{font-size:.92rem;color:var(--muted);margin:0 0 20px}
+      .clan-second b{color:var(--ink)}
+      .clan-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+      .clan-copy-msg{font-family:var(--font-mono);font-size:.82rem;color:var(--yellow);margin:16px 0 0;min-height:1.3em;text-align:center}
+      @media(min-width:1024px) and (orientation:landscape){
+        .clan-shell{max-width:880px;margin-left:auto;margin-right:auto}
+      }
+      @media(max-width:767px){
+        .clan-shell{padding:26px 20px}
+        .clan-opts{gap:12px}
+        .clan-opt{padding:17px 18px}
+        .clan-card{padding:24px 18px}
+        .clan-actions .btn{width:100%;justify-content:center}
+      }
+      @media(min-width:768px){
+        .clan-shell{padding:34px 36px}
+      }
+
       /* ---------- compartir / fuentes ---------- */
       .share-box{
         background:radial-gradient(110% 160% at 50% 0%,rgba(252,227,0,.1),transparent 60%),var(--panel);
@@ -812,8 +885,8 @@
       .btn-ghost:hover{border-style:solid}
 
       /* ---------- cinta amarilla sujetando tarjetas y paneles ---------- */
-      .card,.diagram-shell,.bishop-box,.quiz-shell,.escape-shell,.sources,.open-q{position:relative}
-      .card::before,.diagram-shell::before,.bishop-box::before,.quiz-shell::before,.escape-shell::before{
+      .card,.diagram-shell,.bishop-box,.quiz-shell,.clan-shell,.escape-shell,.sources,.open-q{position:relative}
+      .card::before,.diagram-shell::before,.bishop-box::before,.quiz-shell::before,.clan-shell::before,.escape-shell::before{
         content:"";position:absolute;top:-9px;left:50%;width:92px;height:20px;z-index:4;pointer-events:none;
         transform:translateX(-50%) rotate(-1.6deg);
         background:linear-gradient(180deg,rgba(252,227,0,.88),rgba(252,227,0,.72));
@@ -821,7 +894,7 @@
         box-shadow:0 2px 5px rgba(0,0,0,.3);opacity:.9;
       }
       body.mode-trench .card::before,body.mode-trench .diagram-shell::before,body.mode-trench .bishop-box::before,
-      body.mode-trench .quiz-shell::before,body.mode-trench .escape-shell::before{background:linear-gradient(180deg,rgba(20,20,16,.85),rgba(20,20,16,.7))}
+      body.mode-trench .quiz-shell::before,body.mode-trench .clan-shell::before,body.mode-trench .escape-shell::before{background:linear-gradient(180deg,rgba(20,20,16,.85),rgba(20,20,16,.7))}
       .chapter{position:relative}
       .chapter::before{
         content:"";position:absolute;top:0;left:0;right:0;height:5px;z-index:3;pointer-events:none;
@@ -1389,6 +1462,7 @@
           <a href="#canciones">Canciones</a>
           <a href="#cartas">Cartas</a>
           <a href="#quiz">Quiz</a>
+          <a href="#bando">Tu bando</a>
           <a href="#compartir">Compartir</a>
           <a href="#sugerencias">Sugerencias</a>
         </nav>
@@ -2453,6 +2527,48 @@
         </div>
       </section>
 
+      <!-- ================= TEST DE BANDO ================= -->
+      <section id="bando">
+        <div class="wrap">
+          <div class="sec-head reveal">
+            <p class="sec-kicker">No es un quiz · Es un espejo</p>
+            <h2>¿A qué bando perteneces?</h2>
+            <p class="sec-sub">El quiz de arriba mide lo que <b style="color:var(--ink)">sabes</b> del lore. Este test mide otra cosa: <b style="color:var(--ink)">cómo eres tú</b> dentro de la historia. Ocho situaciones, sin respuestas correctas ni incorrectas: responde lo que harías de verdad, no lo que suena más épico. Al final, Trench te asigna tu lugar: ¿escribes cartas como <b style="color:var(--ink)">Clancy</b>, guías como <b style="color:var(--ink)">Torchbearer</b>, peleas en grupo como un <b style="color:var(--ink)">Bandito</b>, sigues dentro de la muralla como un <b style="color:var(--ink)">ciudadano de Dema</b>… o mandas desde una de las nueve torres como un <b style="color:var(--ink)">Obispo</b>?</p>
+          </div>
+          <div class="clan-shell reveal">
+            <div id="clanPlay">
+              <div class="clan-top">
+                <span class="clan-count" id="clanCount">Situación 1 de 8</span>
+                <span class="clan-note">Responde como eres, no como Clancy</span>
+              </div>
+              <div class="clan-track"><div class="clan-fill" id="clanFill"></div></div>
+              <p class="clan-q" id="clanQ"></p>
+              <div class="clan-opts" id="clanOpts"></div>
+            </div>
+            <div class="clan-final" id="clanFinal" aria-live="polite">
+              <div class="clan-card" id="clanCard">
+                <p class="clan-kicker">Tu lugar en la historia es</p>
+                <span class="clan-glyph" id="clanGlyph" aria-hidden="true">|-/</span>
+                <p class="clan-name" id="clanName"></p>
+                <p class="clan-role" id="clanRole"></p>
+                <p class="clan-desc" id="clanDesc"></p>
+                <ul class="clan-traits" id="clanTraits"></ul>
+                <div class="clan-meta">
+                  <div><b>Tu canción en la historia</b><span id="clanSong"></span></div>
+                  <div><b>Tu reto, según el lore</b><span id="clanChallenge"></span></div>
+                </div>
+                <p class="clan-second" id="clanSecond"></p>
+                <div class="clan-actions">
+                  <button class="btn btn-yellow" id="clanShare" type="button">Compartir mi resultado</button>
+                  <button class="btn btn-ghost" id="clanRestart" type="button">Hacer el test de nuevo</button>
+                </div>
+                <p class="clan-copy-msg" id="clanCopyMsg" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= COMPARTIR ================= -->
       <section id="compartir">
         <div class="wrap">
@@ -3314,6 +3430,229 @@
         render();
       })();
 
+      /* ============ TEST DE BANDO: ¿A QUÉ BANDO PERTENECES? ============ */
+      var CLAN_QUESTIONS = [
+        { q: "Despiertas en un cuarto gris y todo se siente igual que ayer. ¿Qué haces primero?", opts: [
+          { f: "clancy", t: "Escribo lo que siento, aunque nadie lo lea. Necesito sacarlo para entenderlo." },
+          { f: "dema", t: "Me quedo un rato más. Afuera no conozco nada, y lo conocido, aunque duela, se siente seguro." },
+          { f: "bandito", t: "Salgo a buscar a mi grupo. Solo, este lugar me gana; acompañado, no." },
+          { f: "obispo", t: "Reviso que todo y todos estén en su lugar. El orden es lo que nos mantiene a salvo." },
+          { f: "torch", t: "Busco a mi gente para saber si están bien. Si ellos están bien, yo encuentro el rumbo." }
+        ] },
+        { q: "Frente a ti hay un muro enorme que todos dicen que no se puede cruzar. Tú…", opts: [
+          { f: "bandito", t: "Lo cruzamos juntos, con un plan y cubriéndonos entre todos." },
+          { f: "clancy", t: "Ya lo intenté antes y fallé. Igual lo voy a intentar otra vez." },
+          { f: "dema", t: "Me da miedo cruzarlo. ¿Y si del otro lado es peor?" },
+          { f: "torch", t: "Busco la ruta primero, y luego vuelvo por los demás para guiarlos." },
+          { f: "obispo", t: "Si el muro está ahí, es por algo. Mi trabajo es que nadie se acerque." }
+        ] },
+        { q: "Elige lo que nunca te faltaría en la mochila:", opts: [
+          { f: "torch", t: "Una antorcha, para alumbrar también el camino de otros." },
+          { f: "obispo", t: "Las llaves del lugar y la lista de reglas, para que nada se salga de control." },
+          { f: "clancy", t: "Una libreta y algo para escribir. Siempre." },
+          { f: "bandito", t: "Cinta amarilla, para que mi gente me reconozca a lo lejos." },
+          { f: "dema", t: "Un mapa de lo que ya conozco, aunque sea chiquito." }
+        ] },
+        { q: "Un amigo tuyo quiere rendirse y quedarse donde está, aunque ahí no es feliz. ¿Qué haces?", opts: [
+          { f: "dema", t: "Lo entiendo perfecto. A veces yo también siento que rendirse es lo más fácil." },
+          { f: "torch", t: "Me quedo a su lado el tiempo que haga falta. No lo arrastro: lo acompaño hasta que pueda caminar." },
+          { f: "obispo", t: "Le explico por qué quedarse es lo correcto. Afuera solo hay peligro." },
+          { f: "clancy", t: "Le cuento que yo también estuve ahí, y que salir cuesta, pero se puede." },
+          { f: "bandito", t: "Lo llevo al campamento: que vea con sus ojos que hay otra vida y gente que ya salió." }
+        ] },
+        { q: "¿Qué frase te queda mejor?", opts: [
+          { f: "obispo", t: "«Sin reglas, todo se cae.»" },
+          { f: "bandito", t: "«Sahlo Folina: no dejamos a nadie atrás.»" },
+          { f: "dema", t: "«Aquí al menos sé cómo funciona todo.»" },
+          { f: "clancy", t: "«Tengo que sacarlo de mi cabeza: escribirlo, cantarlo, lo que sea.»" },
+          { f: "torch", t: "«Si te pierdes, búscame: yo te muestro el camino de vuelta.»" }
+        ] },
+        { q: "Tu miedo más grande aparece frente a ti, con los ojos rojos. Tú…", opts: [
+          { f: "clancy", t: "Lo miro de frente y lo convierto en palabras. Es mi forma de pelear." },
+          { f: "bandito", t: "Llamo refuerzos. A ese miedo lo enfrentamos entre varios." },
+          { f: "torch", t: "Me planto entre el miedo y mi gente. Primero ellos." },
+          { f: "dema", t: "Bajo la mirada y espero a que pase. Casi siempre pasa… ¿no?" },
+          { f: "obispo", t: "Lo uso. Un poco de miedo mantiene a todos en línea." }
+        ] },
+        { q: "En un grupo, tu lugar natural es…", opts: [
+          { f: "bandito", t: "El de la fogata: junto a todos, organizo y animo." },
+          { f: "dema", t: "El que prefiere seguir al grupo y no llamar la atención." },
+          { f: "torch", t: "El que guía sin hacer ruido y aparece justo cuando lo necesitan." },
+          { f: "clancy", t: "El que siente todo intensamente y lo dice, aunque le tiemble la voz." },
+          { f: "obispo", t: "El que pone las reglas y revisa que se cumplan." }
+        ] },
+        { q: "Si tu historia tuviera que cerrar con un final, elegirías…", opts: [
+          { f: "dema", t: "Una vida tranquila dentro de lo que ya conozco." },
+          { f: "obispo", t: "Una ciudad en orden, donde yo decida qué es lo mejor para todos." },
+          { f: "torch", t: "Quedarme en el camino, con la antorcha encendida, esperando a los que vienen detrás." },
+          { f: "bandito", t: "Un campamento en el valle, con mi gente, libre al fin." },
+          { f: "clancy", t: "Escapar, aunque sé que mañana tendré que pelear conmigo otra vez." }
+        ] }
+      ];
+      var CLAN_RESULTS = {
+        clancy: {
+          name: "Clancy", role: "El fugitivo que escribe", glyph: "|-/", accent: "#ff7a1a",
+          desc: "Eres el que siente todo primero y lo convierte en cartas y canciones. Ya intentaste salir de tu propia Dema más de una vez, y aunque te hayan traído de vuelta, sigues guardando la flor en el cajón: <b>el próximo intento ya viene</b>. Tu fuerza no es no tener miedo; es mirarlo de frente, escribirlo y volver a correr.",
+          traits: ["Siente y lo escribe", "Recae, pero reintenta", "Busca la salida"],
+          song: "«Navigating» y «Overcompensate»: perderse, orientarse y salir otra vez, con la capucha puesta.",
+          challenge: "No creerte la voz que dice que ya no puedes. Esa voz tiene nombre —Nico— y no eres tú.",
+          touch: "escribes y sientes como Clancy"
+        },
+        torch: {
+          name: "Torchbearer", role: "El que guía con la antorcha", glyph: "✦", accent: "#fce300",
+          desc: "Eres la presencia que aparece cuando alguien más está perdido en Trench. No necesitas protagonismo: tu lugar es <b>al lado, con la luz encendida</b>, el tiempo que haga falta. En la historia, Torchbearer cruza el mar helado y espera lo que sea necesario; tú eres de ese tipo de lealtad que no se anuncia, se demuestra.",
+          traits: ["Leal sin condiciones", "Guía sin imponer", "Aparece en el momento justo"],
+          song: "«My Blood»: si estás solo, yo me quedo. Esa es, literalmente, tu forma de estar.",
+          challenge: "Acordarte de que tú también puedes perderte, y que dejarte guiar no te hace menos guía.",
+          touch: "guías como Torchbearer"
+        },
+        bandito: {
+          name: "Bandito de Trench", role: "Rebelde del campamento amarillo", glyph: "||-//", accent: "#9dc24b",
+          desc: "Lo tuyo es el <b>nosotros</b>. Sabes que nadie escapa solo: hay campamento, fogata, cinta amarilla y un plan que se cumple entre todos. Eres de los que bajan al valle a buscar al que falta, de los que tiran pétalos para marcar el camino de los que vienen detrás. En Trench, tu gente es tu casa.",
+          traits: ["Equipo ante todo", "Amarillo y a la vista", "No deja a nadie atrás"],
+          song: "«Bandito» y «Jumpsuit»: el campamento, la caída y la mano que te levanta.",
+          challenge: "No apagar tu luz para encajar. El amarillo se usa a la vista, aunque Dema no pueda verlo.",
+          touch: "peleas en grupo como un Bandito"
+        },
+        dema: {
+          name: "Ciudadano de Dema", role: "Todavía dentro de la muralla", glyph: "⊙", accent: "#a49e8d",
+          desc: "Hoy tu resultado sale <b>dentro de Dema</b>, y eso no es un insulto: así empieza la historia de Clancy. Valoras lo conocido, la rutina te da seguridad y cruzar el muro todavía te da más miedo que quedarte. Pero ojo: respondiste este test con honestidad, y los Obispos no pueden ver el amarillo… <b>tú sí lo viste en esta página</b>. Algo en ti ya está mirando la muralla.",
+          traits: ["Valora lo conocido", "Prudente ante el cambio", "Despierto, aunque no lo sepa"],
+          song: "«Stressed Out» y «Choker»: la rutina que aprieta y las ganas tímidas de salir de ella.",
+          challenge: "Tu siguiente paso no es escapar hoy: es atreverte a preguntar por qué la ciudad insiste en que no hay nada afuera.",
+          touch: "todavía traes algo de Dema dentro"
+        },
+        obispo: {
+          name: "Obispo de Dema", role: "Guardián del orden de las nueve torres", glyph: "●●●", accent: "#e03126",
+          desc: "Te salió el lado del <b>control</b>: reglas claras, cada quien en su lugar y cero improvisación. En Dema, eso te pondría una túnica roja y una de las nueve torres, con tu distrito bajo vigilancia. No es un resultado «malo»: habla de que el orden te da paz y de que cargas con la responsabilidad de que todo funcione. Solo cuida que esa paz no se vuelva muralla —para ti ni para los demás—. Y recuerda el dato clave del lore: <b>hasta un Obispo, Keons, decidió un día ayudar a escapar</b>.",
+          traits: ["Orden y estructura", "Convicción firme", "Manda y protege"],
+          song: "«Nico and the Niners»: los nueve, nombrados uno por uno. Tu himno, te guste o no.",
+          challenge: "Preguntarte si el orden que defiendes protege a la gente… o solo protege al orden. Keons se lo preguntó, y cambió la historia.",
+          touch: "mandas como un Obispo"
+        }
+      };
+      (function clanInit() {
+        var idx = 0, locked = false, resultKey = null;
+        var scores = { clancy: 0, torch: 0, bandito: 0, dema: 0, obispo: 0 };
+        var order = ["clancy", "torch", "bandito", "dema", "obispo"];
+        var play = document.getElementById("clanPlay");
+        var final = document.getElementById("clanFinal");
+        var qEl = document.getElementById("clanQ");
+        var optsEl = document.getElementById("clanOpts");
+        var countEl = document.getElementById("clanCount");
+        var fillEl = document.getElementById("clanFill");
+        var card = document.getElementById("clanCard");
+        var copyMsg = document.getElementById("clanCopyMsg");
+        if (!play || !final || !qEl || !optsEl) return;
+        function render() {
+          locked = false;
+          var item = CLAN_QUESTIONS[idx];
+          countEl.textContent = "Situación " + (idx + 1) + " de " + CLAN_QUESTIONS.length;
+          fillEl.style.width = (idx / CLAN_QUESTIONS.length) * 100 + "%";
+          qEl.textContent = item.q;
+          optsEl.innerHTML = "";
+          item.opts.forEach(function (opt) {
+            var b = document.createElement("button");
+            b.type = "button"; b.className = "clan-opt";
+            b.innerHTML = '<span class="opt-dot" aria-hidden="true"></span><span></span>';
+            b.querySelector("span:last-child").textContent = opt.t;
+            b.addEventListener("click", function () { pick(opt.f, b); });
+            optsEl.appendChild(b);
+          });
+        }
+        function pick(f, btn) {
+          if (locked) return;
+          locked = true;
+          scores[f]++;
+          btn.classList.add("picked");
+          optsEl.querySelectorAll(".clan-opt").forEach(function (b) { b.disabled = true; });
+          fillEl.style.width = ((idx + 1) / CLAN_QUESTIONS.length) * 100 + "%";
+          window.setTimeout(function () {
+            if (idx < CLAN_QUESTIONS.length - 1) { idx++; render(); }
+            else { finish(); }
+          }, 420);
+        }
+        function finish() {
+          var sorted = order.slice().sort(function (a, b) { return scores[b] - scores[a]; });
+          resultKey = sorted[0];
+          var second = sorted[1];
+          var r = CLAN_RESULTS[resultKey];
+          card.style.setProperty("--clan-accent", r.accent);
+          document.getElementById("clanGlyph").textContent = r.glyph;
+          document.getElementById("clanName").textContent = r.name;
+          document.getElementById("clanRole").textContent = r.role;
+          document.getElementById("clanDesc").innerHTML = r.desc;
+          var traitsEl = document.getElementById("clanTraits");
+          traitsEl.innerHTML = "";
+          r.traits.forEach(function (t) {
+            var li = document.createElement("li");
+            li.textContent = t;
+            traitsEl.appendChild(li);
+          });
+          document.getElementById("clanSong").textContent = r.song;
+          document.getElementById("clanChallenge").textContent = r.challenge;
+          var secondEl = document.getElementById("clanSecond");
+          if (second && scores[second] > 0) {
+            secondEl.innerHTML = "Y traes un toque de <b>" + CLAN_RESULTS[second].name + "</b>: " + CLAN_RESULTS[second].touch + ". Nadie en Trench es una sola cosa.";
+          } else {
+            secondEl.textContent = "";
+          }
+          copyMsg.textContent = "";
+          play.style.display = "none";
+          final.classList.add("show");
+          card.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        document.getElementById("clanRestart").addEventListener("click", function () {
+          idx = 0; resultKey = null;
+          scores = { clancy: 0, torch: 0, bandito: 0, dema: 0, obispo: 0 };
+          final.classList.remove("show");
+          play.style.display = "";
+          render();
+          document.getElementById("bando").scrollIntoView({ behavior: "smooth" });
+        });
+        document.getElementById("clanShare").addEventListener("click", function () {
+          if (!resultKey) return;
+          var r = CLAN_RESULTS[resultKey];
+          var museUrl = "https://muse.ai/s/bienvenido-a-trench-el-lore-de-twenty-xev6xexyxzfzxgxpxy/PEt_NkpyDJZbawPdM9X7rGyzurH2Oa--q4Ozq_k5o9Q";
+          var githubUrl = "https://enriquemarco077-svg.github.io/bienvenido-a-trench/";
+          var onGithub = /(^|\.)github\.io$/i.test(window.location.hostname || "");
+          var publicUrl = onGithub ? githubUrl : museUrl;
+          var text = "|-/ Hice el test de bandos de «Bienvenido a Trench» y mi lugar en la historia es: " + r.name + " — " + r.role + ". ¿Tú a qué bando perteneces? East is Up.\n\n" + publicUrl;
+          function done(msgText) {
+            copyMsg.textContent = msgText;
+            window.setTimeout(function () { copyMsg.textContent = ""; }, 5200);
+          }
+          if (navigator.share) {
+            navigator.share({ title: "Bienvenido a Trench — mi bando", text: text }).then(function () {
+              done("Resultado compartido. Que la antorcha llegue lejos. 🔦");
+            }).catch(function () {});
+            return;
+          }
+          function fallback() {
+            try {
+              var ta = document.createElement("textarea");
+              ta.value = text;
+              ta.setAttribute("readonly", "");
+              ta.style.position = "fixed"; ta.style.top = "0"; ta.style.left = "0"; ta.style.opacity = "0";
+              document.body.appendChild(ta);
+              ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+              var ok = false;
+              try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+              document.body.removeChild(ta);
+              done(ok ? "Tu resultado se copió: pégalo donde quieras y reta a alguien a hacer el test." : "No se pudo copiar automáticamente; tu resultado es: " + r.name + " — " + r.role + ".");
+            } catch (e) {
+              done("Tu resultado es: " + r.name + " — " + r.role + ".");
+            }
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              done("Tu resultado se copió: pégalo donde quieras y reta a alguien a hacer el test.");
+            }).catch(fallback);
+          } else { fallback(); }
+        });
+        render();
+      })();
+
       /* ============ COMPARTIR ============ */
       (function shareInit() {
         var msg = document.getElementById("copyMsg");
@@ -3332,7 +3671,7 @@
             ? "Enlace de esta experiencia en GitHub — cópialo y pégalo donde quieras"
             : "Enlace de esta experiencia en Muse — cópialo y pégalo donde quieras";
         }
-        var invite = "|-/ Estoy recorriendo «Bienvenido a Trench», la experiencia interactiva con TODO el lore de Twenty One Pilots: la historia de Dema y Clancy capítulo a capítulo, el mapa de Trench, los nueve Obispos, los símbolos, las canciones clave y un quiz al final. Tienes que verla. East is Up.";
+        var invite = "|-/ Estoy recorriendo «Bienvenido a Trench», la experiencia interactiva con TODO el lore de Twenty One Pilots: la historia de Dema y Clancy capítulo a capítulo, el mapa de Trench, los nueve Obispos, los símbolos, las canciones clave, un quiz y un test para descubrir a qué bando perteneces. Tienes que verla. East is Up.";
         var inviteWithLink = invite + "\n\n" + publicUrl;
         var shareData = {
           title: "Bienvenido a Trench: el lore de Twenty One Pilots",
