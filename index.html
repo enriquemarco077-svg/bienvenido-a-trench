@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark" />
     <meta name="description" content="La historia completa de Dema, Trench y Clancy: el lore de Twenty One Pilots explicado capítulo a capítulo, con mapa interactivo, personajes, símbolos, línea de tiempo, quiz y test para descubrir a qué bando perteneces." />
     <link rel="icon" href="data:," />
-    <title>Bienvenido a Trench: el lore de Twenty One Pilots</title>
+    <title>El universo de Twenty One Pilots</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -1486,7 +1486,7 @@
       <span class="tape-x tx-2" aria-hidden="true"></span>
       <div class="wrap" style="width:100%">
         <p class="hero-logo" aria-hidden="true">|-/</p>
-        <h1>Bienvenido<br />a <span class="y">Trench</span></h1>
+        <h1>El universo<br />de <span class="y">Twenty One Pilots</span></h1>
         <p class="lede">Durante diez años, Twenty One Pilots escondió una historia completa dentro de sus canciones: una ciudad que te quiere muerto, nueve obispos de túnica roja, un fugitivo llamado Clancy y unos rebeldes de amarillo que nunca dejan de buscarlo. Esto es todo ese lore, explicado desde cero.</p>
         <div class="hero-cta">
           <a class="btn btn-yellow" href="#historia">Comenzar la historia</a>
@@ -2648,6 +2648,7 @@
         <p>«Debemos destruirlos o nos convertiremos en ellos. Y si nos convertimos en ellos, debemos hacerlo mejor.»</p>
         <p>Hecho con las cartas de Clancy, los códigos de los fans y diez años de antorchas encendidas.</p>
         <p class="east">East is up · Sahlo Folina · Stay alive</p>
+        <p>Una página de fans para fans, sin fines de lucro.</p>
       </div>
     </footer>
 
@@ -3632,7 +3633,7 @@
         }
         function clanShareText() {
           var r = CLAN_RESULTS[resultKey];
-          return "|-/ Hice el test de bandos de «Bienvenido a Trench» y mi lugar en la historia es: " + r.name + " — " + r.role + ". ¿Tú a qué bando perteneces? East is Up.\n\n" + clanPublicUrl();
+          return "|-/ Hice el test de bandos de «El universo de Twenty One Pilots» y mi lugar en la historia es: " + r.name + " — " + r.role + ". ¿Tú a qué bando perteneces? East is Up.\n\n" + clanPublicUrl();
         }
         function clanDone(msgText) {
           copyMsg.textContent = msgText;
@@ -3683,7 +3684,7 @@
           ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
           ctx.fillStyle = "#fce300";
           ctx.font = "700 25px 'Space Mono', monospace";
-          ctx.fillText("BIENVENIDO A TRENCH", W / 2, 138);
+          ctx.fillText("EL UNIVERSO DE TWENTY ONE PILOTS", W / 2, 138);
           ctx.fillStyle = "#8f8b7f";
           ctx.font = "700 21px 'Space Mono', monospace";
           ctx.fillText("TU LUGAR EN LA HISTORIA ES", W / 2, 182);
@@ -3869,7 +3870,7 @@
             try { file = new File([clanBlob], "mi-bando-trench.jpg", { type: "image/jpeg" }); } catch (e) { file = null; }
             var text = clanShareText();
             if (file && navigator.canShare && navigator.share) {
-              var payload = { files: [file], title: "Bienvenido a Trench — mi bando", text: text };
+              var payload = { files: [file], title: "El universo de Twenty One Pilots — mi bando", text: text };
               if (navigator.canShare(payload)) {
                 navigator.share(payload).then(function () {
                   clanDone("Imagen compartida. Que la antorcha llegue lejos.");
@@ -3881,7 +3882,7 @@
               }
             }
             if (navigator.share) {
-              navigator.share({ title: "Bienvenido a Trench — mi bando", text: text }).then(function () {
+              navigator.share({ title: "El universo de Twenty One Pilots — mi bando", text: text }).then(function () {
                 downloadClanImage();
               }).catch(function (err) {
                 if (err && err.name === "AbortError") { clanDone("Tu tarjeta JPG está lista aquí abajo para descargarla."); return; }
@@ -3913,16 +3914,16 @@
             ? "Enlace de esta experiencia en GitHub — cópialo y pégalo donde quieras"
             : "Enlace de esta experiencia en Muse — cópialo y pégalo donde quieras";
         }
-        var invite = "|-/ Estoy recorriendo «Bienvenido a Trench», la experiencia interactiva con TODO el lore de Twenty One Pilots: la historia de Dema y Clancy capítulo a capítulo, el mapa de Trench, los nueve Obispos, los símbolos, las canciones clave, un quiz y un test para descubrir a qué bando perteneces. Tienes que verla. East is Up.";
+        var invite = "|-/ Estoy recorriendo «El universo de Twenty One Pilots», la experiencia interactiva con TODO el lore de Twenty One Pilots: la historia de Dema y Clancy capítulo a capítulo, el mapa de Trench, los nueve Obispos, los símbolos, las canciones clave, un quiz y un test para descubrir a qué bando perteneces. Tienes que verla. East is Up.";
         var inviteWithLink = invite + "\n\n" + publicUrl;
         var shareData = {
-          title: "Bienvenido a Trench: el lore de Twenty One Pilots",
+          title: "El universo de Twenty One Pilots",
           text: invite,
           url: publicUrl
         };
         // For apps that ignore the url field, also provide a combined text+url payload
         var shareDataWithLinkInText = {
-          title: "Bienvenido a Trench: el lore de Twenty One Pilots",
+          title: "El universo de Twenty One Pilots",
           text: inviteWithLink
         };
         function copied(text) {
