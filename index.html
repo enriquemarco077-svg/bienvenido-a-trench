@@ -127,6 +127,21 @@
         padding:10px 11px;border-radius:8px;white-space:nowrap;display:flex;align-items:center;min-height:2.75rem;
       }
       .topnav nav a:hover,.topnav nav a:focus-visible{color:var(--yellow);background:var(--panel)}
+      .topnav nav a.active{color:var(--yellow);background:var(--panel-2);box-shadow:inset 0 -2px 0 var(--yellow)}
+
+      /* ---------- navegación por secciones (una sola página) ----------
+         Cada apartado de la barra superior muestra solo su sección;
+         el resto queda oculto hasta que se elige desde la navegación. */
+      .view-panel[hidden]{display:none !important}
+      .view-pager{
+        display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;
+        margin:36px 0 6px;padding-top:24px;border-top:1px solid var(--line-soft);
+      }
+      .view-pager .vp-spacer{flex:1 1 auto}
+      .vp-btn{flex-direction:column;align-items:flex-start;gap:1px;line-height:1.25;text-align:left}
+      .vp-btn.vp-next{align-items:flex-end;text-align:right;margin-left:auto}
+      .vp-dir{font-family:var(--font-mono);font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+      .vp-name{font-family:var(--font-display);font-size:1.05rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
 
       /* ---------- hero ---------- */
       .hero{
@@ -4790,6 +4805,157 @@
         window.addEventListener("resize", check);
         window.addEventListener("load", function () { check(); setTimeout(check, 1500); setTimeout(check, 3500); });
         check();
+      })();
+    </script>
+    <script>
+      /* ============ NAVEGACIÓN POR SECCIONES EN UNA SOLA PÁGINA ============
+         La barra superior funciona como pestañas: cada apartado muestra
+         únicamente su sección y oculta las demás, sin salir de la página.
+         El #hash de la dirección refleja la sección abierta, así que los
+         enlaces directos (#mapa, #quiz, #bando…) siguen funcionando y el
+         botón "atrás" del navegador regresa a la sección anterior. */
+      (function sectionRouter() {
+        var VIEWS = [
+          { key: "inicio",      label: "Inicio",          ids: ["inicio", "resumen"] },
+          { key: "historia",    label: "Historia",        ids: ["historia"] },
+          { key: "escape",      label: "Tu escape",       ids: ["escape"] },
+          { key: "mapa",        label: "Mapa",            ids: ["mapa"] },
+          { key: "personajes",  label: "Personajes",      ids: ["personajes"] },
+          { key: "simbolos",    label: "Símbolos",        ids: ["simbolos"] },
+          { key: "evolucion",   label: "Evolución",       ids: ["evolucion"] },
+          { key: "linea",       label: "Línea de tiempo", ids: ["linea"] },
+          { key: "canciones",   label: "Canciones",       ids: ["canciones"] },
+          { key: "cartas",      label: "Cartas",          ids: ["arg", "cartas", "versus"] },
+          { key: "quiz",        label: "Quiz",            ids: ["quiz"] },
+          { key: "bando",       label: "Tu bando",        ids: ["bando"] },
+          { key: "compartir",   label: "Compartir",       ids: ["compartir"] },
+          { key: "sugerencias", label: "Sugerencias",     ids: ["sugerencias", "fuentes"] }
+        ];
+        var byKey = {}, byId = {};
+        VIEWS.forEach(function (v) {
+          byKey[v.key] = v;
+          v.ids.forEach(function (id) { byId[id] = v; });
+        });
+        var navLinks = Array.prototype.slice.call(document.querySelectorAll('.topnav nav a[href^="#"]'));
+        var current = null;
+
+        /* Marca los paneles y deja visible solo la vista inicial */
+        VIEWS.forEach(function (v) {
+          v.ids.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) { el.classList.add("view-panel"); el.hidden = true; }
+          });
+        });
+
+        function centerNavLink(a) {
+          var nav = a.parentNode;
+          if (!nav || !nav.getBoundingClientRect) return;
+          var nr = nav.getBoundingClientRect(), ar = a.getBoundingClientRect();
+          var target = nav.scrollLeft + (ar.left - nr.left) - (nav.clientWidth - ar.width) / 2;
+          nav.scrollLeft = Math.max(0, target);
+        }
+
+        function activate(key) {
+          var v = byKey[key];
+          if (!v) return;
+          current = key;
+          VIEWS.forEach(function (view) {
+            var show = view.key === key;
+            view.ids.forEach(function (id) {
+              var el = document.getElementById(id);
+              if (el) el.hidden = !show;
+            });
+          });
+          navLinks.forEach(function (a) {
+            var on = a.getAttribute("href") === "#" + key;
+            a.classList.toggle("active", on);
+            if (on) { a.setAttribute("aria-current", "page"); centerNavLink(a); }
+            else a.removeAttribute("aria-current");
+          });
+          var bar = document.querySelector(".topnav");
+          if (bar) bar.classList.remove("nav-hidden");
+          document.body.classList.remove("nav-hidden");
+        }
+
+        /* Muestra la vista de un id y lleva la vista a donde toca:
+           al principio de la página si es la sección principal de la
+           vista, o hasta el bloque concreto si es un apartado interno
+           (p. ej. #versus dentro de la vista de Cartas). */
+        function goToId(id, push) {
+          var view = byId[id];
+          if (!view) return false;
+          activate(view.key);
+          if (view.ids[0] === id) {
+            window.scrollTo(0, 0);
+          } else {
+            var target = document.getElementById(id);
+            if (target && target.scrollIntoView) target.scrollIntoView();
+            else window.scrollTo(0, 0);
+          }
+          if (push) {
+            try { history.pushState(null, "", "#" + id); } catch (e) {}
+          }
+          /* Avisa a los sistemas de reveal/progreso de que hay contenido nuevo en pantalla */
+          window.dispatchEvent(new Event("scroll"));
+          return true;
+        }
+
+        /* Todo enlace interno de la página pasa por el enrutador */
+        document.addEventListener("click", function (e) {
+          var t = e.target;
+          var a = (t && t.closest) ? t.closest('a[href^="#"]') : null;
+          if (!a) return;
+          var hash = a.getAttribute("href");
+          if (!hash || hash.length < 2) return;
+          if (goToId(hash.slice(1), true)) e.preventDefault();
+        });
+
+        /* Botón atrás / adelante y enlaces directos con #hash */
+        window.addEventListener("hashchange", function () {
+          var id = (location.hash || "").slice(1);
+          if (id && byId[id]) goToId(id, false);
+          else if (!id) { activate("inicio"); window.scrollTo(0, 0); }
+        });
+
+        /* Botones Anterior / Siguiente al final de cada sección */
+        VIEWS.forEach(function (v, i) {
+          var last = document.getElementById(v.ids[v.ids.length - 1]);
+          var wrap = last && last.querySelector(".wrap");
+          if (!wrap) return;
+          var pager = document.createElement("nav");
+          pager.className = "view-pager";
+          pager.setAttribute("aria-label", "Anterior y siguiente sección");
+          var prev = VIEWS[i - 1], next = VIEWS[i + 1];
+          if (prev) {
+            var pa = document.createElement("a");
+            pa.className = "btn btn-ghost vp-btn";
+            pa.href = "#" + prev.key;
+            pa.innerHTML = '<span class="vp-dir">← Anterior</span><span class="vp-name"></span>';
+            pa.querySelector(".vp-name").textContent = prev.label;
+            pager.appendChild(pa);
+          } else {
+            var sp = document.createElement("span");
+            sp.className = "vp-spacer";
+            pager.appendChild(sp);
+          }
+          if (next) {
+            var na = document.createElement("a");
+            na.className = "btn btn-yellow vp-btn vp-next";
+            na.href = "#" + next.key;
+            na.innerHTML = '<span class="vp-dir">Siguiente →</span><span class="vp-name"></span>';
+            na.querySelector(".vp-name").textContent = next.label;
+            pager.appendChild(na);
+          }
+          wrap.appendChild(pager);
+        });
+
+        /* Vista inicial: la del #hash si llega un enlace directo; si no, Inicio */
+        var startId = (location.hash || "").slice(1);
+        if (startId && byId[startId]) {
+          goToId(startId, false);
+        } else {
+          activate("inicio");
+        }
       })();
     </script>
   </body>
