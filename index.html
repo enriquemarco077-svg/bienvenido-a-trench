@@ -4746,7 +4746,13 @@
           dragging=true; dragMoved=false;
           dragStartX=e.clientX; dragStartLeft=nav.scrollLeft;
           samples=[{x:e.clientX, t:performance.now()}];
-          try{ nav.setPointerCapture(e.pointerId); }catch(err){}
+          /* OJO: aquí NO se captura el puntero. Capturarlo en el
+             pointerdown hace que el navegador re-apunte el evento click
+             al <nav> en vez de al enlace tocado, y los apartados de la
+             barra dejan de cambiar de sección con ratón o lápiz (con el
+             dedo no pasaba: el táctil no entra a este arrastre). La
+             captura se hace en pointermove, solo cuando el arrastre ya
+             es real. */
         });
         nav.addEventListener("pointermove", function(e){
           if(!dragging) return;
@@ -4754,6 +4760,10 @@
           if(!dragMoved && Math.abs(dx)>6){
             dragMoved=true;
             bar.classList.add("nav-dragging");
+            /* Arrastre confirmado: ahora sí se captura el puntero para
+               seguir el gesto aunque salga de la barra. Como ya es un
+               arrastre, el clic final queda suprimido y no navega. */
+            try{ nav.setPointerCapture(e.pointerId); }catch(err){}
           }
           if(dragMoved){
             nav.scrollLeft=dragStartLeft-dx;
